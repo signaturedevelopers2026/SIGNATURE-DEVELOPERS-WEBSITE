@@ -9,7 +9,7 @@ const multer = require('multer');
 // Multer Config
 const employeePhotoStorage = multer.diskStorage({
     destination: (req, file, cb) => {
-        const dir = path.join(__dirname, 'uploads', 'employees');
+        const dir = process.env.VERCEL ? path.join('/tmp', 'uploads', 'employees') : path.join(__dirname, 'uploads', 'employees');
         if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
         cb(null, dir);
     },
@@ -28,10 +28,22 @@ app.use(express.json());
 app.use(cors());
 
 // File Paths
-const EMPLOYEES_FILE = path.join(__dirname, 'employees.json');
-const MESSAGES_FILE = path.join(__dirname, 'messages.json');
-const CUSTOMERS_FILE = path.join(__dirname, 'customers.json');
-const BOOKINGS_FILE = path.join(__dirname, 'bookings.json');
+const EMPLOYEES_FILE = process.env.VERCEL ? '/tmp/employees.json' : path.join(__dirname, 'employees.json');
+const MESSAGES_FILE = process.env.VERCEL ? '/tmp/messages.json' : path.join(__dirname, 'messages.json');
+const CUSTOMERS_FILE = process.env.VERCEL ? '/tmp/customers.json' : path.join(__dirname, 'customers.json');
+const BOOKINGS_FILE = process.env.VERCEL ? '/tmp/bookings.json' : path.join(__dirname, 'bookings.json');
+
+// Copy initial mock data if in Vercel to tmp
+if (process.env.VERCEL) {
+    [
+        { src: path.join(__dirname, 'employees.json'), dest: EMPLOYEES_FILE },
+        { src: path.join(__dirname, 'messages.json'), dest: MESSAGES_FILE },
+        { src: path.join(__dirname, 'customers.json'), dest: CUSTOMERS_FILE },
+        { src: path.join(__dirname, 'bookings.json'), dest: BOOKINGS_FILE }
+    ].forEach(({src, dest}) => {
+        if (!fs.existsSync(dest) && fs.existsSync(src)) fs.copyFileSync(src, dest);
+    });
+}
 
 // Helper functions for data persistence
 const getEmployees = () => {
@@ -90,8 +102,8 @@ const pendingOtps = {};
 const pendingSignUps = {}; 
 
 // Serve static frontend files
-app.use(express.static(path.join(__dirname)));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use(express.static(path.join(__dirname, 'public')));
+app.use('/uploads', express.static(process.env.VERCEL ? path.join('/tmp', 'uploads') : path.join(__dirname, 'uploads')));
 
 // API Routes
 app.post('/api/contact', async (req, res) => {
@@ -240,11 +252,12 @@ app.post('/api/booking', async (req, res) => {
 });
 
 // Direct Page Routes
-app.get('/web-dev.html', (req, res) => res.sendFile('web-dev.html', { root: __dirname }));
-app.get('/app-dev.html', (req, res) => res.sendFile('app-dev.html', { root: __dirname }));
-app.get('/marketing.html', (req, res) => res.sendFile('marketing.html', { root: __dirname }));
-app.get('/c-dashboard.html', (req, res) => res.sendFile('c-dashboard.html', { root: __dirname }));
-app.get('/', (req, res) => res.sendFile('index.html', { root: __dirname }));
+const staticRoot = path.join(__dirname, 'public');
+app.get('/web-dev.html', (req, res) => res.sendFile('web-dev.html', { root: staticRoot }));
+app.get('/app-dev.html', (req, res) => res.sendFile('app-dev.html', { root: staticRoot }));
+app.get('/marketing.html', (req, res) => res.sendFile('marketing.html', { root: staticRoot }));
+app.get('/c-dashboard.html', (req, res) => res.sendFile('c-dashboard.html', { root: staticRoot }));
+app.get('/', (req, res) => res.sendFile('index.html', { root: staticRoot }));
 
 // Start Server locally
 if (process.env.NODE_ENV !== 'production') {
