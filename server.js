@@ -102,7 +102,7 @@ const pendingOtps = {};
 const pendingSignUps = {}; 
 
 // Serve static frontend files
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname)));
 app.use('/uploads', express.static(process.env.VERCEL ? path.join('/tmp', 'uploads') : path.join(__dirname, 'uploads')));
 
 // API Routes
@@ -252,7 +252,7 @@ app.post('/api/booking', async (req, res) => {
 });
 
 // Direct Page Routes
-const staticRoot = path.join(__dirname, 'public');
+const staticRoot = path.join(__dirname);
 app.get('/web-dev.html', (req, res) => res.sendFile('web-dev.html', { root: staticRoot }));
 app.get('/app-dev.html', (req, res) => res.sendFile('app-dev.html', { root: staticRoot }));
 app.get('/marketing.html', (req, res) => res.sendFile('marketing.html', { root: staticRoot }));
