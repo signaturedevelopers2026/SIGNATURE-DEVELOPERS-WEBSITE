@@ -9,7 +9,7 @@ const multer = require('multer');
 // Multer Config
 const employeePhotoStorage = multer.diskStorage({
     destination: (req, file, cb) => {
-        const dir = process.env.VERCEL ? path.join('/tmp', 'uploads', 'employees') : path.join(__dirname, 'uploads', 'employees');
+        const dir = process.env.VERCEL ? path.join('/tmp', 'uploads', 'employees') : path.join(ROOT_DIR, 'uploads', 'employees');
         if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
         cb(null, dir);
     },
@@ -28,18 +28,19 @@ app.use(express.json());
 app.use(cors());
 
 // File Paths
-const EMPLOYEES_FILE = process.env.VERCEL ? '/tmp/employees.json' : path.join(__dirname, 'employees.json');
-const MESSAGES_FILE = process.env.VERCEL ? '/tmp/messages.json' : path.join(__dirname, 'messages.json');
-const CUSTOMERS_FILE = process.env.VERCEL ? '/tmp/customers.json' : path.join(__dirname, 'customers.json');
-const BOOKINGS_FILE = process.env.VERCEL ? '/tmp/bookings.json' : path.join(__dirname, 'bookings.json');
+const ROOT_DIR = path.join(__dirname, '..');
+const EMPLOYEES_FILE = process.env.VERCEL ? '/tmp/employees.json' : path.join(ROOT_DIR, 'employees.json');
+const MESSAGES_FILE = process.env.VERCEL ? '/tmp/messages.json' : path.join(ROOT_DIR, 'messages.json');
+const CUSTOMERS_FILE = process.env.VERCEL ? '/tmp/customers.json' : path.join(ROOT_DIR, 'customers.json');
+const BOOKINGS_FILE = process.env.VERCEL ? '/tmp/bookings.json' : path.join(ROOT_DIR, 'bookings.json');
 
 // Copy initial mock data if in Vercel to tmp
 if (process.env.VERCEL) {
     [
-        { src: path.join(__dirname, 'employees.json'), dest: EMPLOYEES_FILE },
-        { src: path.join(__dirname, 'messages.json'), dest: MESSAGES_FILE },
-        { src: path.join(__dirname, 'customers.json'), dest: CUSTOMERS_FILE },
-        { src: path.join(__dirname, 'bookings.json'), dest: BOOKINGS_FILE }
+        { src: path.join(ROOT_DIR, 'employees.json'), dest: EMPLOYEES_FILE },
+        { src: path.join(ROOT_DIR, 'messages.json'), dest: MESSAGES_FILE },
+        { src: path.join(ROOT_DIR, 'customers.json'), dest: CUSTOMERS_FILE },
+        { src: path.join(ROOT_DIR, 'bookings.json'), dest: BOOKINGS_FILE }
     ].forEach(({src, dest}) => {
         if (!fs.existsSync(dest) && fs.existsSync(src)) fs.copyFileSync(src, dest);
     });
@@ -102,8 +103,8 @@ const pendingOtps = {};
 const pendingSignUps = {}; 
 
 // Serve static frontend files
-app.use(express.static(path.join(__dirname)));
-app.use('/uploads', express.static(process.env.VERCEL ? path.join('/tmp', 'uploads') : path.join(__dirname, 'uploads')));
+app.use(express.static(path.join(ROOT_DIR)));
+app.use('/uploads', express.static(process.env.VERCEL ? path.join('/tmp', 'uploads') : path.join(ROOT_DIR, 'uploads')));
 
 // API Routes
 app.post('/api/contact', async (req, res) => {
@@ -252,7 +253,7 @@ app.post('/api/booking', async (req, res) => {
 });
 
 // Direct Page Routes
-const staticRoot = path.join(__dirname);
+const staticRoot = path.join(ROOT_DIR);
 app.get('/web-dev.html', (req, res) => res.sendFile('web-dev.html', { root: staticRoot }));
 app.get('/app-dev.html', (req, res) => res.sendFile('app-dev.html', { root: staticRoot }));
 app.get('/marketing.html', (req, res) => res.sendFile('marketing.html', { root: staticRoot }));
