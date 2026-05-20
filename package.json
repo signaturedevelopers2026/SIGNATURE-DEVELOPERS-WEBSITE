@@ -1,7 +1,9 @@
 {
+  "name": "signature-developers",
+  "version": "1.0.0",
+  "private": true,
   "scripts": {
-    "start": "node \"api/[...path].js\"",
-    "build": "echo 'No build step required'"
+    "start": "node api/[...path].js"
   },
   "dependencies": {
     "cors": "^2.8.6",
