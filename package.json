@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "start": "node api/[...path].js"
+    "start": "node api/index.js"
   },
   "dependencies": {
     "cors": "^2.8.6",
