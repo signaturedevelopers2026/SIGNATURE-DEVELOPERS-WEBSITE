@@ -260,4 +260,9 @@ app.get('/marketing.html', (req, res) => res.sendFile('marketing.html', { root: 
 app.get('/c-dashboard.html', (req, res) => res.sendFile('c-dashboard.html', { root: staticRoot }));
 app.get('/', (req, res) => res.sendFile('index.html', { root: staticRoot }));
 
+// Start Server locally
+if (!process.env.VERCEL) {
+    app.listen(PORT, () => console.log(`Server running locally on port ${PORT}`));
+}
+
 module.exports = app;
