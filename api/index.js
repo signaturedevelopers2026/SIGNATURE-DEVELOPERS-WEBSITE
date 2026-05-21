@@ -260,9 +260,4 @@ app.get('/marketing.html', (req, res) => res.sendFile('marketing.html', { root: 
 app.get('/c-dashboard.html', (req, res) => res.sendFile('c-dashboard.html', { root: staticRoot }));
 app.get('/', (req, res) => res.sendFile('index.html', { root: staticRoot }));
 
-// Start Server locally
-if (process.env.NODE_ENV !== 'production') {
-    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-}
-
 module.exports = app;
